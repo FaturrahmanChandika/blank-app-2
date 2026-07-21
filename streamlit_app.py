@@ -8,8 +8,9 @@ KET=["😎 Kelihatannya sederhana, tapi isi rekeningnya bikin banyak orang penas
 st.markdown("""
 <style>
 .stApp{background:#F5F0E6;background-attachment:fixed}
-.stButton>button{height:64px;font-size:20px;font-weight:bold;width:100%}
-div[data-testid="stTextInput"] input{height:64px;font-size:22px;border-radius:12px;width:100%;box-sizing:border-box}
+.stButton>button{height:64px;font-size:20px;font-weight:bold;width:100%;border-radius:12px;background:#8DE3D1;color:#000;border:none}
+.stButton>button:hover{background:#76D8C4;color:#000}
+div[data-testid="stTextInput"] input{height:64px;font-size:22px;border-radius:12px;width:100%;box-sizing:border-box;background:#8DE3D1;color:#000}
 .t{width:100%;border-collapse:collapse}.t th{background:linear-gradient(90deg,#2563eb,#9333ea,#ec4899);color:#fff;padding:12px}.t td{border:1px solid #ddd;padding:12px;text-align:center}
 div[data-testid="column"]:nth-child(1) div[data-testid="stTextInput"]{margin-top:0px}
 </style>
@@ -23,11 +24,11 @@ with c3:
         st.session_state.rows=[];st.rerun()
 if add and n.strip():
     random.seed(int(hashlib.md5(n.lower().encode()).hexdigest(),16))
-    row={"nama":n.upper(),"bank":random.choice(BANK),"saldo":"Rp {:,}".format(random.randint(100000,500000000)).replace(",","."),"motor":random.choice(MOTOR),"mobil":random.choice(MOBIL),"ket":random.choice(KET)}
+    row={"nama":n.upper(),"bank":random.choice(BANK),"saldo":"Rp {:,}".format(random.randint(100000,500000000)).replace(",", "."),"motor":random.choice(MOTOR),"mobil":random.choice(MOBIL),"ket":random.choice(KET)}
     st.session_state.rows=[r for r in st.session_state.rows if r["nama"]!=row["nama"]]
     st.session_state.rows.insert(0,row)
 h="<table class='t'><tr><th>No</th><th>Nama</th><th>Saldo</th><th>Motor</th><th>Mobil</th><th style='background:#facc15;color:#000'>Keterangan</th></tr>"
 for i,r in enumerate(st.session_state.rows,1):
-    colors=["#ffe4e6","#dbeafe","#dcfce7","#fef3c7","#ede9fe","#fce7f3"];bg=colors[(i-1)%len(colors)];h+=f"<tr style=\"background:{bg}\"><td>{i}</td><td>{r['nama']}</td><td>{r['bank'][1]} {r['bank'][0]}<br><b>{r['saldo']}</b></td><td>🏍️ {r['motor']}</td><td>🚗 {r['mobil']}</td><td style='background:{bg}'>{r['ket']}</td></tr>"
+    colors=["#ffe4e6","#dbeafe","#dcfce7","#fef3c7","#ede9fe","#fce7f3"];bg=colors[(i-1)%len(colors)];h+=f"<tr style='background:{bg}'><td>{i}</td><td>{r['nama']}</td><td>{r['bank'][1]} {r['bank'][0]}<br><b>{r['saldo']}</b></td><td>🏍️ {r['motor']}</td><td>🚗 {r['mobil']}</td><td style='background:{bg}'>{r['ket']}</td></tr>"
 h+="</table>"
 st.markdown(h,unsafe_allow_html=True)
