@@ -661,7 +661,7 @@ if st.button("🔍 TEBAK SEKARANG"):
 
         kiri, kanan = st.columns(2)
 
-             with kiri:
+        with kiri:
 
             card(
                 "👤",
