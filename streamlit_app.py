@@ -661,39 +661,38 @@ if st.button("🔍 TEBAK SEKARANG"):
 
         kiri, kanan = st.columns(2)
 
-      with kiri:
+             with kiri:
 
-    card(
-        "👤",
-        "Nama",
-        nama.title()
-    )
+            card(
+                "👤",
+                "Nama",
+                nama.title()
+            )
 
-    card(
-        "❤️",
-        "Status",
-        hasil["status"]
-    )
+            card(
+                "❤️",
+                "Status",
+                hasil["status"]
+            )
 
-    saldo = hasil["saldo"]
+            saldo = hasil["saldo"]
 
-    if saldo >= 1000000000:
-        icon = "👑"
+            if saldo >= 1_000_000_000:
+                icon = "👑"
+            elif saldo >= 100_000_000:
+                icon = "💎"
+            elif saldo >= 10_000_000:
+                icon = "💰"
+            else:
+                icon = "💵"
 
-    elif saldo >= 100000000:
-        icon = "💎"
+            card(
+                icon,
+                "Saldo Bank",
+                rupiah(saldo)
+            )
 
-    elif saldo >= 10000000:
-        icon = "💰"
-
-    else:
-        icon = "💵"
-
-    card(
-        icon,
-        "Saldo Bank",
-        rupiah(saldo)
-    )
+        with kanan:
 
             card(
                 "🚗",
