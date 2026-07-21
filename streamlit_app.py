@@ -42,7 +42,7 @@ animation:floatdots 25s linear infinite}
  .stButton>button{animation:pulse 1s infinite;height:64px;font-size:20px;font-weight:bold;width:100%;border-radius:12px;background:#8DE3D1;color:#000;border:none}
 .stButton>button:hover{background:#76D8C4;color:#000}
 div[data-testid="stTextInput"] input{height:64px;font-size:22px;border-radius:12px;width:100%;box-sizing:border-box;background:#8DE3D1;color:#000}
-.t{width:100%;border-collapse:collapse}.t th{background:linear-gradient(90deg,red,orange,yellow,green,cyan,blue,violet,red);background-size:400%;animation:rainbow 6s linear infinite;color:#fff;padding:12px}.t td{border:1px solid #ddd;padding:12px;text-align:center}
+.t{width:100%;border-collapse:collapse}.t th{background:linear-gradient(90deg,red,orange,yellow,green,cyan,blue,violet,red);background-size:400%;color:#fff;padding:12px}.t td{border:1px solid #ddd;padding:12px;text-align:center}
 div[data-testid="column"]:nth-child(1) div[data-testid="stTextInput"]{margin-top:0px}
 </style>
 <h1 class='title'><span class='money'>💰</span> APLIKASI TEBAK ISI SALDO <span class='money'>💰</span></h1>
