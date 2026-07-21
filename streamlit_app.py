@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import random
 import hashlib
 import time
@@ -8,21 +9,28 @@ import time
 # ==========================================
 
 st.set_page_config(
-    page_title="AI Tebak Hiburan",
+    page_title="AI Tebak Kehidupan",
     page_icon="🤖",
     layout="wide"
 )
 
 # ==========================================
-# CSS PREMIUM
+# SESSION STATE
+# ==========================================
+
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+# ==========================================
+# CSS
 # ==========================================
 
 st.markdown("""
 <style>
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;800&display=swap');
 
-*{
+html,body,[class*="css"]{
 font-family:'Poppins',sans-serif;
 }
 
@@ -30,13 +38,12 @@ font-family:'Poppins',sans-serif;
 
 background:linear-gradient(
 135deg,
-#4f46e5,
-#2563eb,
-#06b6d4
+#4F46E5,
+#2563EB,
+#06B6D4
 );
 
 background-size:400% 400%;
-
 animation:bg 12s ease infinite;
 
 }
@@ -44,49 +51,36 @@ animation:bg 12s ease infinite;
 @keyframes bg{
 
 0%{background-position:0% 50%;}
-
 50%{background-position:100% 50%;}
-
 100%{background-position:0% 50%;}
 
 }
 
 .block-container{
 
-padding-top:30px;
-
-padding-bottom:40px;
-
 max-width:1200px;
+padding-top:30px;
+padding-bottom:40px;
 
 }
 
 .title{
 
-font-size:55px;
-
-font-weight:800;
-
 text-align:center;
-
+font-size:52px;
+font-weight:800;
 color:white;
-
 margin-bottom:5px;
-
-text-shadow:0px 4px 15px rgba(0,0,0,.35);
+text-shadow:0 5px 15px rgba(0,0,0,.35);
 
 }
 
 .sub{
 
 text-align:center;
-
-font-size:20px;
-
+font-size:18px;
 color:white;
-
-margin-bottom:35px;
-
+margin-bottom:30px;
 opacity:.95;
 
 }
@@ -94,22 +88,17 @@ opacity:.95;
 div[data-baseweb="input"]{
 
 background:rgba(255,255,255,.15);
-
 backdrop-filter:blur(15px);
-
-border-radius:18px;
-
+border-radius:15px;
 border:1px solid rgba(255,255,255,.25);
 
 }
 
 div[data-baseweb="input"] input{
 
-color:white;
-
 font-size:20px;
-
 font-weight:600;
+color:white;
 
 }
 
@@ -122,27 +111,13 @@ color:#eeeeee;
 .stButton>button{
 
 width:100%;
-
-height:62px;
-
+height:55px;
 border:none;
-
-border-radius:18px;
-
-font-size:22px;
-
-font-weight:700;
-
-background:linear-gradient(
-90deg,
-#ff6b00,
-#ff0066
-);
-
+border-radius:15px;
+font-size:20px;
+font-weight:bold;
+background:linear-gradient(90deg,#ff6b00,#ff0066);
 color:white;
-
-box-shadow:0 10px 25px rgba(0,0,0,.25);
-
 transition:.3s;
 
 }
@@ -151,58 +126,33 @@ transition:.3s;
 
 transform:scale(1.02);
 
-box-shadow:0 12px 35px rgba(0,0,0,.35);
-
 }
 
 .card{
 
-background:rgba(255,255,255,.18);
-
-backdrop-filter:blur(18px);
-
-border:1px solid rgba(255,255,255,.25);
-
-border-radius:22px;
-
-padding:20px;
-
-margin-bottom:18px;
-
-text-align:center;
-
-box-shadow:0 10px 25px rgba(0,0,0,.25);
-
-transition:.3s;
-
-}
-
-.card:hover{
-
-transform:translateY(-4px);
+background:rgba(255,255,255,.16);
+backdrop-filter:blur(16px);
+border-radius:18px;
+padding:18px;
+margin-bottom:15px;
+border:1px solid rgba(255,255,255,.20);
 
 }
 
 .card-title{
 
-font-size:17px;
-
+font-size:16px;
 font-weight:600;
-
-color:#F3F4F6;
-
-margin-bottom:10px;
+color:#F1F5F9;
 
 }
 
 .card-value{
 
-font-size:30px;
-
+font-size:26px;
 font-weight:800;
-
 color:white;
-
+margin-top:8px;
 word-wrap:break-word;
 
 }
@@ -210,64 +160,65 @@ word-wrap:break-word;
 .footer{
 
 text-align:center;
-
 color:white;
-
-opacity:.9;
-
+opacity:.8;
 margin-top:40px;
-
-font-size:15px;
-
-}
-
-hr{
-
-border:none;
-
-height:1px;
-
-background:rgba(255,255,255,.25);
-
-margin:30px 0;
 
 }
 
 </style>
-""",unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # ==========================================
 # HEADER
 # ==========================================
 
 st.markdown("""
-
 <div class="title">
-
-🤖 AI TEBAK KEHIDUPAN 🤖
-
+🤖 AI TEBAK KEHIDUPAN
 </div>
 
 <div class="sub">
-
-Masukkan nama • AI akan membaca aura keberuntunganmu 😎
-
+Masukkan nama lalu biarkan AI menebak kehidupanmu 😎
 </div>
-
-""",unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 nama = st.text_input(
-
 "",
-
 placeholder="Masukkan Nama..."
-
 )
 
-st.markdown("<br>",unsafe_allow_html=True)
+# ==========================================
+# DATABASE BANK
+# ==========================================
+
+BANK = [
+
+"BCA",
+"BRI",
+"BNI",
+"Mandiri",
+"BTN",
+"CIMB Niaga",
+"Permata",
+"Danamon",
+"BSI",
+"OCBC",
+"Maybank",
+"Panin Bank",
+"Mega",
+"Jago",
+"SeaBank",
+"Neo Bank",
+"Allo Bank",
+"HSBC",
+"DBS",
+"UOB"
+
+]
 
 # ==========================================
-# DATABASE
+# DATABASE STATUS
 # ==========================================
 
 STATUS = [
@@ -276,54 +227,16 @@ STATUS = [
 "Pacaran ❤️",
 "HTS 🤭",
 "Move On 😌",
-"Single Bahagia 😁",
 "Menikah 💍",
 "LDR 🌍",
-"Rahasia 🤫",
-"Fokus Cari Uang 💰",
-"Gebetan Banyak 😆"
+"Single Bahagia 😁",
+"Rahasia 🤫"
 
 ]
 
-HOBBY = [
-
-"Main Mobile Legends",
-"Main PUBG",
-"Main Free Fire",
-"Main Valorant",
-"Main Roblox",
-"Main FC Mobile",
-"Main GTA V",
-"Ngopi",
-"Nonton Anime",
-"Nonton Film",
-"Nonton Drakor",
-"Traveling",
-"Mancing",
-"Gym",
-"Jogging",
-"Badminton",
-"Basket",
-"Futsal",
-"Berenang",
-"Sepeda",
-"Motoran",
-"Mobilan",
-"Fotografi",
-"Masak",
-"Kulineran",
-"Streaming",
-"TikTok",
-"YouTube",
-"Main Gitar",
-"Nyanyi",
-"Tidur",
-"Belanja",
-"Main Catur",
-"Coding",
-"Edit Video"
-
-]
+# ==========================================
+# DATABASE MOBIL
+# ==========================================
 
 MOBIL = [
 
@@ -331,174 +244,366 @@ MOBIL = [
 "Honda Jazz",
 "Honda City",
 "Honda Civic Turbo",
+"Honda Accord",
+"Honda WR-V",
 "Honda HR-V",
 "Honda CR-V",
 
 "Toyota Agya",
-"Toyota Raize",
+"Toyota Calya",
 "Toyota Avanza",
+"Toyota Veloz",
 "Toyota Rush",
-"Toyota Fortuner",
+"Toyota Raize",
+"Toyota Innova Reborn",
 "Toyota Innova Zenix",
+"Toyota Fortuner",
+"Toyota Camry",
 "Toyota Alphard",
 
 "Mitsubishi Xpander",
 "Mitsubishi Pajero Sport",
+"Mitsubishi Triton",
 
-"Suzuki XL7",
 "Suzuki Ertiga",
+"Suzuki XL7",
+"Suzuki Jimny",
 
 "Daihatsu Rocky",
 "Daihatsu Terios",
-
-"Wuling Air EV",
-"Wuling Alvez",
 
 "Hyundai Creta",
 "Hyundai Stargazer",
 "Hyundai Ioniq 5",
 
 "Kia Sonet",
+"Kia Seltos",
+
+"Wuling Air EV",
+"Wuling Alvez",
+"Wuling Almaz",
+
+"Mazda 2",
+"Mazda 3",
+"Mazda CX3",
+"Mazda CX5",
+
+"Nissan Livina",
+"Nissan XTrail",
+"Nissan GTR",
 
 "BMW M3",
 "BMW M4",
+"BMW M5",
 "BMW X5",
 
 "Mercedes C200",
 "Mercedes E300",
 "Mercedes G63 AMG",
 
+"Audi A6",
+"Audi RS5",
 "Audi RS6",
 
-"Lexus RX",
+"Lexus RX350",
+"Lexus LX600",
 
 "Tesla Model 3",
+"Tesla Model Y",
 
 "Porsche 911",
-
-"Nissan GTR",
+"Porsche Cayenne",
 
 "Ferrari 488",
+"Ferrari F8",
 
 "Lamborghini Huracan",
+"Lamborghini Aventador",
 
 "McLaren 720S",
 
-"Rolls Royce Phantom"
+"Rolls Royce Phantom",
+"Rolls Royce Cullinan"
 
 ]
+# ==========================================
+# DATABASE MOTOR
+# ==========================================
 
 MOTOR = [
 
-"Honda Beat",
-"Honda Scoopy",
-"Honda Genio",
-"Honda Vario 125",
-"Honda Vario 160",
-"Honda PCX",
-"Honda ADV160",
-"Honda CB150R",
-"Honda CBR150R",
-"Honda CBR250RR",
+# Honda
+"Honda Beat","Honda Beat Street","Honda Scoopy","Honda Genio",
+"Honda Vario 125","Honda Vario 160","Honda PCX 160",
+"Honda ADV160","Honda Supra X","Honda Sonic 150R",
+"Honda CB150R","Honda CBR150R","Honda CBR250RR",
 
-"Yamaha Mio",
-"Yamaha Gear",
-"Yamaha Fazzio",
-"Yamaha Lexi",
-"Yamaha NMAX",
-"Yamaha Aerox",
-"Yamaha XMAX",
-"Yamaha MT15",
-"Yamaha R15",
-"Yamaha R25",
+# Yamaha
+"Yamaha Mio M3","Yamaha Gear","Yamaha Fazzio",
+"Yamaha Lexi","Yamaha NMAX","Yamaha Aerox",
+"Yamaha XMAX","Yamaha Jupiter Z1","Yamaha MX King",
+"Yamaha MT15","Yamaha R15","Yamaha R25",
 
+# Kawasaki
 "Kawasaki Ninja 250",
 "Kawasaki ZX25R",
 "Kawasaki ZX6R",
+"Kawasaki ZX10R",
+"Kawasaki W175",
 
-"Suzuki GSX150",
+# Suzuki
 "Suzuki Satria FU",
+"Suzuki GSX150",
+"Suzuki Burgman",
 
+# Vespa
 "Vespa Sprint",
 "Vespa Primavera",
+"Vespa GTS",
 
-"Harley Davidson",
-
+# Premium
 "BMW S1000RR",
-
 "Ducati Panigale",
-
+"Ducati Monster",
+"Harley Davidson Street 750",
+"Harley Davidson Fat Boy",
 "KTM Duke 390",
-
-"Triumph Street Triple"
+"KTM RC390",
+"Triumph Street Triple",
+"Royal Enfield Himalayan"
 
 ]
+
+# ==========================================
+# DATABASE PEKERJAAN
+# ==========================================
 
 PEKERJAAN = [
 
 "Programmer",
 "Software Engineer",
+"Web Developer",
+"Mobile Developer",
+"Frontend Developer",
+"Backend Developer",
+"Fullstack Developer",
+"AI Engineer",
+"Machine Learning Engineer",
+"Data Scientist",
+"Data Analyst",
+"Cyber Security",
+"Network Engineer",
+"Cloud Engineer",
+"DevOps Engineer",
+"UI UX Designer",
+"Game Developer",
+"QA Engineer",
+"System Analyst",
 "Dokter",
-"Pilot",
-"Polisi",
-"TNI",
-"CEO",
-"Pengusaha",
-"Content Creator",
-"TikToker",
-"YouTuber",
-"Streamer",
+"Dokter Gigi",
+"Perawat",
+"Apoteker",
+"Bidan",
 "Guru",
 "Dosen",
-"Barista",
-"Chef",
-"Animator",
-"Desainer Grafis",
-"Fotografer",
-"Editor Video",
-"Data Analyst",
-"AI Engineer",
-"Cyber Security",
-"Trader",
-"Investor",
-"Marketing",
-"Manager",
-"Arsitek",
-"Freelancer",
-"Akuntan",
-"Notaris",
+"Pilot",
+"Pramugari",
+"Masinis",
+"Nahkoda",
+"Polisi",
+"TNI",
 "Hakim",
 "Jaksa",
+"Notaris",
+"Pengusaha",
+"CEO",
+"Direktur",
+"Manager",
+"Supervisor",
+"HRD",
+"Marketing",
+"Sales",
+"Akuntan",
+"Auditor",
+"Arsitek",
+"Interior Designer",
+"Chef",
+"Barista",
+"Fotografer",
+"Videografer",
+"Editor Video",
+"Animator",
+"Desainer Grafis",
+"YouTuber",
+"Streamer",
+"TikToker",
 "Influencer",
-"UI/UX Designer"
+"Content Creator",
+"Trader",
+"Investor",
+"Freelancer"
 
 ]
+
+# ==========================================
+# DATABASE HOBI
+# ==========================================
+
+HOBBY = [
+
+"Coding",
+"Main Mobile Legends",
+"Main PUBG",
+"Main Free Fire",
+"Main Valorant",
+"Main Roblox",
+"Main Minecraft",
+"Main GTA V",
+"Main FC Mobile",
+"Main eFootball",
+"Nonton Anime",
+"Nonton Film",
+"Nonton Drakor",
+"Kulineran",
+"Traveling",
+"Ngopi",
+"Fotografi",
+"Videografi",
+"Memancing",
+"Camping",
+"Hiking",
+"Gym",
+"Jogging",
+"Renang",
+"Basket",
+"Badminton",
+"Futsal",
+"Sepak Bola",
+"Voli",
+"Bersepeda",
+"Touring",
+"Drifting",
+"Balap Motor",
+"Main Gitar",
+"Main Piano",
+"Bernyanyi",
+"Melukis",
+"Membaca Buku",
+"Streaming",
+"Edit Video",
+"Belanja",
+"Masak",
+"Berkebun",
+"Main Catur",
+"Tidur"
+
+]
+
+# ==========================================
+# HP IMPIAN
+# ==========================================
+
+HP = [
+
+"iPhone 16 Pro Max",
+"iPhone 16 Pro",
+"iPhone 15 Pro Max",
+"Samsung S25 Ultra",
+"Samsung Z Fold 7",
+"Samsung Z Flip 7",
+"Xiaomi 15 Ultra",
+"Xiaomi 15 Pro",
+"Redmi Note 14 Pro",
+"POCO F7",
+"POCO X7 Pro",
+"ASUS ROG Phone 9",
+"ASUS Zenfone",
+"OPPO Find X8 Pro",
+"OPPO Reno 14 Pro",
+"Vivo X200 Pro",
+"Vivo V50",
+"Realme GT 7 Pro",
+"Huawei Pura 70 Ultra",
+"Google Pixel 9 Pro"
+
+]
+
+# ==========================================
+# RUMAH IMPIAN
+# ==========================================
+
+RUMAH = [
+
+"Rumah Minimalis",
+"Rumah Modern",
+"Rumah Mewah",
+"Villa Bali",
+"Penthouse Jakarta",
+"Rumah Pinggir Pantai",
+"Rumah Pegunungan",
+"Rumah Smart Home",
+"Rumah 2 Lantai",
+"Istana Pribadi"
+
+]
+
+# ==========================================
+# NEGARA LIBURAN
+# ==========================================
+
+NEGARA = [
+
+"Jepang",
+"Korea Selatan",
+"Swiss",
+"Dubai",
+"Amerika Serikat",
+"Inggris",
+"Prancis",
+"Italia",
+"Turki",
+"Singapura",
+"Malaysia",
+"Thailand",
+"Australia",
+"Selandia Baru",
+"Kanada",
+"Maladewa",
+"Arab Saudi",
+"Belanda",
+"Jerman",
+"Spanyol"
+
+]
+
+# ==========================================
+# KOMENTAR AI
+# ==========================================
 
 KOMENTAR = [
 
-"Rezekimu lagi deras hari ini 💰",
+"Rezekimu sedang deras 💸",
 "Sebentar lagi jadi sultan 👑",
-"Rajin usaha ya, hasilnya mantap 💪",
-"Dompetmu bakal makin tebal 😎",
-"Jangan lupa bahagiakan orang tua ❤️",
-"Temanmu yakin kamu bakal sukses 🚀",
+"Kerja kerasmu akan membuahkan hasil 💪",
+"Dompetmu anti tipis 😎",
+"Tahun ini penuh keberuntungan 🍀",
+"Semoga cepat punya rumah impian 🏡",
 "Mobil impian tinggal menunggu waktu 🚗",
-"Kerja keras tidak mengkhianati hasil 💯",
+"Jangan lupa bahagiakan orang tua ❤️",
+"Kalau sukses jangan lupa traktir 🤣",
+"Aura tajirmu mulai kelihatan ✨",
+"Rezeki datang dari arah yang tak terduga 🤲",
+"Semoga semua impianmu tercapai 🚀",
+"Banyak peluang besar menunggumu 📈",
+"Kamu cocok jadi bos besar 😁",
+"Semoga kariermu makin sukses 💼",
+"Jangan lupa tetap rendah hati 😊",
 "Keberuntungan sedang berpihak kepadamu 🍀",
-"Tetap rendah hati ya 😄",
-"Kalau kaya jangan lupa traktir 🤣",
-"Semoga semua impianmu tercapai 🤲",
-"Rezeki datang dari arah yang tak terduga ✨",
-"Jangan boros ya 😆",
-"Tahun ini banyak hoki 🔥",
-"Kamu cocok jadi bos besar 😎",
-"Aura suksesmu mulai terlihat 😁",
-"Semoga cepat punya rumah impian 🏠",
-"Dompetmu anti tipis 💸",
-"Semoga semua urusanmu dipermudah 🙏"
+"Dompetmu bakal makin tebal 💰",
+"Semoga sehat selalu 🙏",
+"Hari ini adalah hari yang bagus untuk memulai sesuatu yang baru 🌟"
 
 ]
-
 # ==========================================
 # AI GENERATOR
 # ==========================================
@@ -507,45 +612,45 @@ def generate_data(nama):
 
     seed = int(
         hashlib.sha256(
-            nama.lower().encode()
-        ).hexdigest(),16
+            nama.lower().strip().encode()
+        ).hexdigest(),
+        16
     )
 
-    random.seed(seed)
+    rnd = random.Random(seed)
 
-    return{
+    return {
 
-        "saldo":random.randint(
+        "nama": nama.title(),
+
+        "bank": rnd.choice(BANK),
+
+        "saldo": rnd.randint(
             500_000,
-            250_000_000_000
+            25_000_000_000
         ),
 
-        "status":random.choice(
-            STATUS
-        ),
+        "status": rnd.choice(STATUS),
 
-        "mobil":random.choice(
-            MOBIL
-        ),
+        "mobil": rnd.choice(MOBIL),
 
-        "motor":random.choice(
-            MOTOR
-        ),
+        "motor": rnd.choice(MOTOR),
 
-        "pekerjaan":random.choice(
-            PEKERJAAN
-        ),
+        "pekerjaan": rnd.choice(PEKERJAAN),
 
-        "hobby":random.choice(
-            HOBBY
-        ),
+        "hobby": rnd.choice(HOBBY),
 
-        "komentar":random.choice(
-            KOMENTAR
-        )
+        "hp": rnd.choice(HP),
+
+        "rumah": rnd.choice(RUMAH),
+
+        "negara": rnd.choice(NEGARA),
+
+        "keberuntungan": rnd.randint(1,100),
+
+        "komentar": rnd.choice(KOMENTAR)
 
     }
-
 
 # ==========================================
 # FORMAT RUPIAH
@@ -557,193 +662,358 @@ def rupiah(angka):
         angka
     ).replace(",", ".")
 
-
 # ==========================================
-# CARD PREMIUM
+# CARD
 # ==========================================
 
-def card(icon, judul, nilai):
+def card(icon,judul,isi):
 
     st.markdown(f"""
     <div class="card">
 
-        <div style="
-        font-size:22px;
-        margin-bottom:8px;">
-        {icon}
-        </div>
-
         <div class="card-title">
-        {judul}
+        {icon} {judul}
         </div>
 
         <div class="card-value">
-        {nilai}
+        {isi}
         </div>
 
     </div>
-    """, unsafe_allow_html=True)
+    """,unsafe_allow_html=True)
+
+# ==========================================
+# GARIS
+# ==========================================
 
 def garis():
 
-    st.markdown("<hr>",unsafe_allow_html=True)
+    st.markdown(
+        "<hr style='border:1px solid rgba(255,255,255,.2);'>",
+        unsafe_allow_html=True
+    )
 
 # ==========================================
-# TOMBOL AI
+# BUTTON
 # ==========================================
 
-if st.button("🔍 TEBAK SEKARANG"):
+col1,col2 = st.columns([4,1])
 
-    if nama.strip() == "":
+with col1:
 
-        st.warning("⚠️ Silakan masukkan nama terlebih dahulu.")
+    cari = st.button(
+        "🔍 TEBAK SEKARANG",
+        use_container_width=True
+    )
+
+with col2:
+
+    reset = st.button(
+        "🗑 HAPUS",
+        use_container_width=True
+    )
+
+# ==========================================
+# RESET
+# ==========================================
+
+if reset:
+
+    st.session_state.history=[]
+
+    st.rerun()
+
+# ==========================================
+# PROSES AI
+# ==========================================
+
+if cari:
+
+    if nama.strip()=="":
+
+        st.warning(
+            "Masukkan nama terlebih dahulu."
+        )
+
+        st.stop()
+
+    progress=st.progress(0)
+
+    info=st.empty()
+
+    proses=[
+
+        "🤖 Menghubungkan AI...",
+
+        "📡 Mengambil Database...",
+
+        "🧠 Menganalisa Nama...",
+
+        "💰 Menghitung Saldo...",
+
+        "🚗 Menentukan Mobil...",
+
+        "🏍 Menentukan Motor...",
+
+        "💼 Menentukan Pekerjaan...",
+
+        "🎮 Menentukan Hobi...",
+
+        "📱 Menentukan HP Impian...",
+
+        "🏡 Menentukan Rumah...",
+
+        "🌎 Menentukan Negara Liburan...",
+
+        "✨ Menyelesaikan Analisa..."
+
+    ]
+
+    for i in range(100):
+
+        progress.progress(i+1)
+
+        if i<10:
+            info.info(proses[0])
+
+        elif i<20:
+            info.info(proses[1])
+
+        elif i<30:
+            info.info(proses[2])
+
+        elif i<40:
+            info.info(proses[3])
+
+        elif i<50:
+            info.info(proses[4])
+
+        elif i<60:
+            info.info(proses[5])
+
+        elif i<70:
+            info.info(proses[6])
+
+        elif i<80:
+            info.info(proses[7])
+
+        elif i<88:
+            info.info(proses[8])
+
+        elif i<94:
+            info.info(proses[9])
+
+        elif i<98:
+            info.info(proses[10])
+
+        else:
+            info.success(proses[11])
+
+        time.sleep(0.02)
+
+    progress.empty()
+
+    info.empty()
+
+    hasil = generate_data(nama)
+
+    st.session_state.history.append(
+        hasil
+    )
+
+    st.balloons()
+
+# ==========================================
+# TAMPILKAN HASIL
+# ==========================================
+
+if len(st.session_state.history) > 0:
+
+    hasil = st.session_state.history[-1]
+
+    garis()
+
+    st.success("🎉 Analisa AI Berhasil!")
+
+    col1, col2 = st.columns(2)
+
+    # ======================================
+    # KOLOM KIRI
+    # ======================================
+
+    with col1:
+
+        card("👤","Nama",hasil["nama"])
+
+        card("🏦","Bank",hasil["bank"])
+
+        card("💰","Saldo",rupiah(hasil["saldo"]))
+
+        card("❤️","Status",hasil["status"])
+
+        card("🍀","Keberuntungan",
+             f'{hasil["keberuntungan"]}%')
+
+    # ======================================
+    # KOLOM KANAN
+    # ======================================
+
+    with col2:
+
+        card("🚗","Mobil",hasil["mobil"])
+
+        card("🏍","Motor",hasil["motor"])
+
+        card("💼","Pekerjaan",hasil["pekerjaan"])
+
+        card("🎮","Hobi",hasil["hobby"])
+
+        card("📱","HP Impian",hasil["hp"])
+
+    card("🏠","Rumah Impian",hasil["rumah"])
+
+    card("✈️","Negara Liburan",hasil["negara"])
+
+    st.markdown("## 😂 Komentar AI")
+
+    st.info(hasil["komentar"])
+
+    # ======================================
+    # LEVEL KEKAYAAN
+    # ======================================
+
+    saldo = hasil["saldo"]
+
+    if saldo >= 10_000_000_000:
+
+        st.success("👑 Level Kekayaan : CRAZY RICH")
+
+    elif saldo >= 1_000_000_000:
+
+        st.success("💎 Level Kekayaan : SULTAN")
+
+    elif saldo >= 100_000_000:
+
+        st.success("💰 Level Kekayaan : ORANG KAYA")
+
+    elif saldo >= 10_000_000:
+
+        st.info("😊 Level Kekayaan : MAPAN")
 
     else:
 
-        progress = st.progress(0)
+        st.warning("😅 Level Kekayaan : PEJUANG")
 
-        status = st.empty()
+    st.markdown("### 🍀 Tingkat Keberuntungan")
 
-        proses = [
+    st.progress(
+        hasil["keberuntungan"] / 100
+    )
 
-            "🤖 Menghubungkan AI...",
-            "📡 Mengambil Database...",
-            "🧠 Menganalisa Nama...",
-            "💰 Menghitung Saldo...",
-            "🚗 Menentukan Kendaraan...",
-            "💼 Menentukan Pekerjaan...",
-            "🎮 Mencari Hobi...",
-            "✨ Menyelesaikan Analisa..."
+# ==========================================
+# RIWAYAT
+# ==========================================
 
-        ]
+garis()
 
-        for i in range(100):
+st.subheader("📋 Riwayat Pencarian")
 
-            progress.progress(i + 1)
+if len(st.session_state.history)==0:
 
-            if i < 12:
-                status.info(proses[0])
+    st.info("Belum ada riwayat.")
 
-            elif i < 25:
-                status.info(proses[1])
+else:
 
-            elif i < 40:
-                status.info(proses[2])
+    tabel=[]
 
-            elif i < 55:
-                status.info(proses[3])
+    for item in st.session_state.history:
 
-            elif i < 70:
-                status.info(proses[4])
+        tabel.append({
 
-            elif i < 82:
-                status.info(proses[5])
+            "Nama":item["nama"],
 
-            elif i < 94:
-                status.info(proses[6])
+            "Bank":item["bank"],
 
-            else:
-                status.success(proses[7])
+            "Saldo":rupiah(item["saldo"]),
 
-            time.sleep(0.02)
+            "Mobil":item["mobil"],
 
-        progress.empty()
+            "Motor":item["motor"],
 
-        status.empty()
+            "Pekerjaan":item["pekerjaan"],
 
-        hasil = generate_data(nama)
+            "Status":item["status"]
 
-        st.balloons()
+        })
 
-        st.success("🎉 Analisa AI Berhasil!")
+    df=pd.DataFrame(tabel)
 
-        garis()
+    st.dataframe(
 
-        kiri, kanan = st.columns(2)
+        df,
 
-        with kiri:
+        use_container_width=True,
 
-            card(
-                "👤",
-                "Nama",
-                nama.title()
+        hide_index=True
+
+    )
+
+# ==========================================
+# STATISTIK
+# ==========================================
+
+if len(st.session_state.history)>0:
+
+    garis()
+
+    st.subheader("📊 Statistik")
+
+    total=len(st.session_state.history)
+
+    rata=sum(
+        x["saldo"]
+        for x in st.session_state.history
+    )//total
+
+    c1,c2,c3=st.columns(3)
+
+    c1.metric(
+        "Jumlah Pencarian",
+        total
+    )
+
+    c2.metric(
+        "Rata-rata Saldo",
+        rupiah(rata)
+    )
+
+    c3.metric(
+        "Saldo Tertinggi",
+        rupiah(
+            max(
+                x["saldo"]
+                for x in st.session_state.history
             )
-
-            card(
-                "❤️",
-                "Status",
-                hasil["status"]
-            )
-
-            saldo = hasil["saldo"]
-
-            if saldo >= 1_000_000_000:
-                icon = "👑"
-            elif saldo >= 100_000_000:
-                icon = "💎"
-            elif saldo >= 10_000_000:
-                icon = "💰"
-            else:
-                icon = "💵"
-
-            card(
-                icon,
-                "Saldo Bank",
-                rupiah(saldo)
-            )
-
-        with kanan:
-
-            card(
-                "🚗",
-                "Mobil",
-                hasil["mobil"]
-            )
-
-            card(
-                "🛵",
-                "Motor",
-                hasil["motor"]
-            )
-
-            card(
-                "💼",
-                "Pekerjaan",
-                hasil["pekerjaan"]
-            )
-
-        card(
-            "🎮",
-            "Hobi",
-            hasil["hobby"]
         )
-
-        st.markdown("## 😂 Keterangan")
-
-        st.info(
-            hasil["komentar"]
-        )
-
-        garis()
+    )
 
 # ==========================================
 # FOOTER
 # ==========================================
 
+garis()
+
 st.markdown("""
 
 <div class="footer">
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🤖 AI Tebak Kehidupan v2.0
 
-🤖 AI Tebak Kehidupan
+Dibuat menggunakan Streamlit
 
-Dibuat hanya untuk hiburan 🎉
-
-Jangan dianggap serius 😆
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Hanya untuk hiburan 🎉
 
 </div>
 
 """,unsafe_allow_html=True)
+
