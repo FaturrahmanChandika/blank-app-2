@@ -7,8 +7,32 @@ MOBIL=["Brio","Agya","Ayla","Avanza","Xenia","Rush","Terios","Raize","Rocky","In
 KET=["😎 Kelihatannya sederhana, tapi isi rekeningnya bikin banyak orang penasaran."," Waw kaya banget","Bagi duit nya dong","Pasti Rajin berbagi","💰 Rajin menabung sejak lama, hasilnya mulai kelihatan.","🚀 Rezekinya lancar, semoga terus bertambah.","👑 Diam-diam menghanyutkan, saldonya lebih besar dari yang dikira.","🎉 Kalau ini saldo asli, akhir bulan tetap senyum."]
 st.markdown("""
 <style>
-.stApp{background:url('https://i.imgur.com/XM6kK6A.png') repeat,linear-gradient(#f5f0e6,#fff8dc);background-size:120px,100%;animation:bgmove 25s linear infinite;background-attachment:fixed}
-@keyframes bgmove{0%{background-position:0 0}100%{background-position:0 1000px}}
+.stApp{
+background:linear-gradient(-45deg,#0f172a,#1d4ed8,#06b6d4,#22c55e,#f59e0b,#ef4444,#7c3aed,#0f172a);
+background-size:700% 700%;
+animation:bgmove 15s ease infinite;
+background-attachment:fixed;
+overflow:hidden}
+.stApp::before{
+content:"";
+position:fixed;
+left:-50%;
+top:-50%;
+width:200%;
+height:200%;
+pointer-events:none;
+background:radial-gradient(circle,rgba(255,255,255,.10) 2px,transparent 3px);
+background-size:60px 60px;
+animation:floatdots 25s linear infinite}
+@keyframes bgmove{
+0%{background-position:0% 50%}
+25%{background-position:50% 100%}
+50%{background-position:100% 50%}
+75%{background-position:50% 0%}
+100%{background-position:0% 50%}}
+@keyframes floatdots{
+0%{transform:translate(0,0) rotate(0deg)}
+100%{transform:translate(-300px,-300px) rotate(360deg)}}
 @keyframes shine{0%{background-position:-300px}100%{background-position:300px}}
 @keyframes money{0%{transform:rotate(-12deg)}100%{transform:rotate(12deg)}}
 @keyframes rainbow{0%{background-position:0%}100%{background-position:200%}}
