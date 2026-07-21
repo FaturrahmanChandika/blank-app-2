@@ -2,546 +2,380 @@ import streamlit as st
 import random
 import hashlib
 
+# ==========================================
+# KONFIGURASI
+# ==========================================
+
 st.set_page_config(
     page_title="Aplikasi Tebak Isi Saldo",
     page_icon="💰",
     layout="wide"
 )
 
-# ==============================
+# ==========================================
 # SESSION
-# ==============================
+# ==========================================
 
-if "data" not in st.session_state:
-    st.session_state.data = []
+if "hasil" not in st.session_state:
+    st.session_state.hasil = []
 
-# ==============================
+# ==========================================
+# DATA
+# ==========================================
+
+BANK = [
+    ("OVO","🟣"),
+    ("DANA","🔵"),
+    ("GoPay","🟢"),
+    ("ShopeePay","🟠"),
+    ("BCA","🏦"),
+    ("BRI","🏦"),
+    ("BNI","🏦"),
+    ("Mandiri","🏦"),
+    ("Permata","🏦"),
+    ("CIMB Niaga","🏦")
+]
+
+MOTOR = [
+    "Honda Beat",
+    "Honda Scoopy",
+    "Honda Vario 160",
+    "Honda PCX",
+    "Yamaha NMAX",
+    "Yamaha Aerox",
+    "CBR150R",
+    "Kawasaki Ninja",
+    "KLX 150",
+    "Vespa Sprint"
+]
+
+MOBIL = [
+    "Honda Brio",
+    "Toyota Avanza",
+    "Innova Zenix",
+    "Fortuner",
+    "Pajero Sport",
+    "Rush",
+    "Raize",
+    "HRV",
+    "Alphard",
+    "BMW M4"
+]
+
+KETERANGAN = [
+    "😎 Sultan berkedok rakyat biasa.",
+    "😂 Rekening bikin iri satu RT.",
+    "🔥 Rajin menabung sejak kecil.",
+    "💰 Dompet selalu tebal.",
+    "🤣 Gaji cuma numpang lewat.",
+    "😅 Jangan pinjam uang ke dia.",
+    "👑 Orang sederhana tapi saldonya luar biasa.",
+    "🤑 Isi rekening bikin tetangga iri."
+]
+
+# ==========================================
 # CSS
-# ==============================
+# ==========================================
 
 st.markdown("""
 <style>
 
-*{
-font-family:Segoe UI,Tahoma,sans-serif;
-}
+#MainMenu{visibility:hidden;}
+footer{visibility:hidden;}
+header{visibility:hidden;}
 
 .stApp{
-
-background:#f4f7fb;
-
+    background:#eef3f8;
 }
-
-/* sembunyikan menu streamlit */
-
-#MainMenu{
-visibility:hidden;
-}
-
-footer{
-visibility:hidden;
-}
-
-header{
-visibility:hidden;
-}
-
-/* HEADER */
 
 .header{
-
-background:linear-gradient(90deg,#2563eb,#4f46e5);
-
-padding:18px;
-
-border-radius:18px;
-
-text-align:center;
-
-color:white;
-
-font-size:34px;
-
-font-weight:bold;
-
-box-shadow:0 8px 25px rgba(0,0,0,.18);
-
-margin-bottom:20px;
-
+    background:linear-gradient(90deg,#2563eb,#4f46e5);
+    color:white;
+    text-align:center;
+    padding:18px;
+    border-radius:18px;
+    font-size:32px;
+    font-weight:bold;
+    margin-bottom:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,.2);
 }
-
-/* SEARCH */
 
 div[data-testid="stTextInput"] input{
-
-height:52px;
-
-border-radius:30px;
-
-border:2px solid #2563eb;
-
-padding-left:18px;
-
-font-size:18px;
-
-background:white;
-
+    height:52px;
+    border-radius:30px;
+    border:2px solid #2563eb;
+    font-size:18px;
 }
 
-/* BUTTON */
-
 .stButton>button{
-
-height:52px;
-
-width:100%;
-
-background:#ef4444;
-
-color:white;
-
-border:none;
-
-border-radius:12px;
-
-font-size:16px;
-
-font-weight:bold;
-
-transition:.25s;
-
+    width:100%;
+    height:52px;
+    border:none;
+    border-radius:12px;
+    background:#ef4444;
+    color:white;
+    font-weight:bold;
+    font-size:16px;
 }
 
 .stButton>button:hover{
-
-background:#dc2626;
-
-color:white;
-
-transform:scale(1.02);
-
+    background:#dc2626;
+    color:white;
 }
 
-/* TABLE */
-
-table{
-
-width:100%;
-
-border-collapse:collapse;
-
-overflow:hidden;
-
-border-radius:16px;
-
-box-shadow:0 8px 25px rgba(0,0,0,.15);
-
-background:white;
-
+.saldo-table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 6px 18px rgba(0,0,0,.15);
 }
 
-thead tr{
-
-background:#16a34a;
-
-color:white;
-
+.saldo-table th{
+    background:#16a34a;
+    color:white;
+    padding:14px;
+    text-align:center;
 }
 
-th{
-
-padding:15px;
-
-font-size:17px;
-
+.saldo-table td{
+    padding:14px;
+    border-bottom:1px solid #e5e7eb;
+    text-align:center;
 }
 
-td{
-
-padding:15px;
-
-border-bottom:1px solid #e5e7eb;
-
-text-align:center;
-
-font-size:16px;
-
+.saldo-table tr:nth-child(even){
+    background:#f8fff8;
 }
 
-tbody tr:nth-child(even){
-
-background:#f8fff9;
-
+.saldo-table tr:hover{
+    background:#dcfce7;
 }
-
-tbody tr:hover{
-
-background:#dcfce7;
-
-transition:.2s;
-
-}
-
-/* BANK */
 
 .bank{
-
-font-weight:bold;
-
-font-size:17px;
-
-color:#2563eb;
-
+    color:#2563eb;
+    font-weight:bold;
 }
 
-.saldo{
-
-font-size:22px;
-
-font-weight:bold;
-
-color:#059669;
-
-margin-top:5px;
-
-}
-
-.ket{
-
-text-align:left;
-
+.nominal{
+    color:#059669;
+    font-size:22px;
+    font-weight:bold;
 }
 
 </style>
-""",unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-# ==============================
+# ==========================================
 # HEADER
-# ==============================
+# ==========================================
 
 st.markdown("""
-
-<div class='header'>
-
+<div class="header">
 💰 APLIKASI TEBAK ISI SALDO 💰
-
 </div>
+""", unsafe_allow_html=True)
 
-""",unsafe_allow_html=True)
-
-# ==============================
-# DATA
-# ==============================
-
-BANK = [
-
-("OVO","🟣"),
-("DANA","🔵"),
-("GoPay","🟢"),
-("ShopeePay","🟠"),
-("BCA","🏦"),
-("BRI","🏦"),
-("BNI","🏦"),
-("Mandiri","🏦"),
-("Permata","🏦"),
-("CIMB Niaga","🏦")
-
-]
-
-MOTOR = [
-
-"Honda Beat",
-"Honda Scoopy",
-"Honda Vario 160",
-"Honda PCX",
-"Yamaha NMAX",
-"Yamaha Aerox",
-"CBR150R",
-"Kawasaki Ninja",
-"KLX 150",
-"Vespa Sprint"
-
-]
-
-MOBIL = [
-
-"Honda Brio",
-"Toyota Avanza",
-"Innova Zenix",
-"Fortuner",
-"Pajero Sport",
-"Rush",
-"Raize",
-"HRV",
-"Alphard",
-"BMW M4"
-
-]
-
-KETERANGAN = [
-
-"😎 Sultan berkedok rakyat biasa.",
-"😂 Rekening bikin iri satu RT.",
-"🔥 Rajin nabung sejak kecil.",
-"💸 Dompet selalu penuh.",
-"🤣 Gaji cuma numpang lewat.",
-"😅 Jangan pinjem uang ke dia.",
-"🤑 Saldo bikin tetangga iri.",
-"👑 Bos kecil tapi rekening besar.",
-"💰 Isi rekening anti tanggal tua.",
-"😆 Orangnya sederhana, saldonya luar biasa."
-
-]
-
-# =====================================================
-# SEARCH + BUTTON
-# =====================================================
+# ==========================================
+# INPUT
+# ==========================================
 
 col1, col2, col3 = st.columns([6,2,2])
 
 with col1:
-    keyword = st.text_input(
+    nama = st.text_input(
         "",
-        placeholder="🔍 Cari nama...",
+        placeholder="🔍 Masukkan nama...",
         label_visibility="collapsed"
     )
 
 with col2:
-
-    tebak = st.button(
+    btn_tebak = st.button(
         "🎲 Tebak Saldo",
         use_container_width=True
     )
 
 with col3:
-
-    hapus = st.button(
+    btn_hapus = st.button(
         "🗑 Hapus Semua",
         use_container_width=True
     )
 
-# =====================================================
-# HAPUS DATA
-# =====================================================
+# ==========================================
+# HAPUS SEMUA
+# ==========================================
 
-if hapus:
-    st.session_state.data = []
+if btn_hapus:
+    st.session_state.hasil.clear()
     st.rerun()
 
-# =====================================================
-# TAMBAH DATA BARU
-# =====================================================
+# ==========================================
+# GENERATE DATA
+# ==========================================
 
-if tebak:
+if btn_tebak:
 
-    if keyword.strip() == "":
+    if nama.strip() == "":
+        st.warning("Silakan masukkan nama.")
+        st.stop()
 
-        st.warning("Masukkan nama terlebih dahulu.")
+    # agar nama yang sama hasilnya selalu sama
+    seed = int(
+        hashlib.md5(
+            nama.lower().encode()
+        ).hexdigest(),
+        16
+    )
 
-    else:
+    random.seed(seed)
 
-        # supaya nama yang sama hasilnya selalu sama
+    bank = random.choice(BANK)
+    motor = random.choice(MOTOR)
+    mobil = random.choice(MOBIL)
+    ket = random.choice(KETERANGAN)
 
-        seed = int(
-            hashlib.md5(
-                keyword.lower().encode()
-            ).hexdigest(),
-            16
-        )
+    nominal = random.randint(
+        100000,
+        500000000
+    )
 
-        random.seed(seed)
+    saldo = f"Rp {nominal:,}".replace(",", ".")
 
-        bank = random.choice(BANK)
+    # cek apakah nama sudah ada
+    ketemu = False
 
-        motor = random.choice(MOTOR)
+    for item in st.session_state.hasil:
 
-        mobil = random.choice(MOBIL)
+        if item["nama"].lower() == nama.lower():
 
-        ket = random.choice(KETERANGAN)
+            ketemu = True
 
-        saldo = random.randint(
-            50000,
-            500000000
-        )
+            item["bank"] = bank[0]
+            item["logo"] = bank[1]
+            item["saldo"] = saldo
+            item["motor"] = motor
+            item["mobil"] = mobil
+            item["ket"] = ket
 
-        saldo = "Rp {:,}".format(saldo).replace(",", ".")
+            break
 
-        # jangan menambah nama yang sama
+    if not ketemu:
 
-        sudah_ada = False
+        st.session_state.hasil.append({
 
-        for item in st.session_state.data:
+            "nama": nama.upper(),
 
-            if item["nama"].lower() == keyword.lower():
+            "bank": bank[0],
 
-                sudah_ada = True
+            "logo": bank[1],
 
-                break
+            "saldo": saldo,
 
-        if not sudah_ada:
+            "motor": motor,
 
-            st.session_state.data.append(
+            "mobil": mobil,
 
-                {
+            "ket": ket
 
-                    "nama": keyword.upper(),
+        })
 
-                    "bank": bank[0],
+# ==========================================
+# FILTER DATA
+# ==========================================
 
-                    "logo": bank[1],
+if nama.strip() == "":
 
-                    "saldo": saldo,
-
-                    "motor": motor,
-
-                    "mobil": mobil,
-
-                    "ket": ket
-
-                }
-
-            )
-
-# =====================================================
-# FILTER PENCARIAN
-# =====================================================
-
-if keyword.strip() == "":
-
-    hasil = st.session_state.data
+    data_tampil = st.session_state.hasil
 
 else:
 
-    hasil = [
+    data_tampil = [
 
-        item
+        x
 
-        for item in st.session_state.data
+        for x in st.session_state.hasil
 
-        if keyword.lower()
-
-        in item["nama"].lower()
+        if nama.lower() in x["nama"].lower()
 
     ]
 
-# =====================================================
+# ==========================================
 # TABEL HTML
-# =====================================================
+# ==========================================
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-if len(hasil) == 0:
+if len(data_tampil) == 0:
 
     st.info("Belum ada data.")
 
 else:
 
     html = """
-
-    <table>
-
-    <thead>
-
-    <tr>
-
-        <th>No</th>
-        <th>Nama</th>
-        <th>Isi Saldo</th>
-        <th>Motor</th>
-        <th>Mobil</th>
-        <th>Keterangan</th>
-
-    </tr>
-
-    </thead>
-
-    <tbody>
-
+    <table class="saldo-table">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Isi Saldo</th>
+                <th>Motor</th>
+                <th>Mobil</th>
+                <th>Keterangan</th>
+            </tr>
+        </thead>
+        <tbody>
     """
 
-    for no, item in enumerate(hasil, start=1):
+    for i, item in enumerate(data_tampil, start=1):
 
         html += f"""
-
         <tr>
-
-            <td><b>{no}</b></td>
+            <td>{i}</td>
 
             <td>
-
                 👤<br>
-
-                <b>{item['nama']}</b>
-
+                <b>{item["nama"]}</b>
             </td>
 
             <td>
-
-                <div class="bank">
-
-                    {item['logo']} {item['bank']}
-
-                </div>
-
-                <div class="saldo">
-
-                    {item['saldo']}
-
-                </div>
-
+                <div class="bank">{item["logo"]} {item["bank"]}</div>
+                <div class="nominal">{item["saldo"]}</div>
             </td>
 
             <td>
-
                 🏍️<br>
-
-                {item['motor']}
-
+                {item["motor"]}
             </td>
 
             <td>
-
                 🚗<br>
-
-                {item['mobil']}
-
+                {item["mobil"]}
             </td>
 
-            <td class="ket">
-
-                {item['ket']}
-
+            <td style="text-align:left;">
+                {item["ket"]}
             </td>
 
         </tr>
-
         """
 
     html += """
-
-    </tbody>
-
+        </tbody>
     </table>
-
     """
 
     st.markdown(html, unsafe_allow_html=True)
 
-# =====================================================
-# FOOTER
-# =====================================================
-
 st.markdown(
 """
-<br><br>
-
 <div style="text-align:center;
+margin-top:25px;
 color:gray;
 font-size:14px;">
 
-Dibuat menggunakan ❤️ Streamlit + HTML + CSS
+Made with ❤️ Streamlit
 
 </div>
 """,
-unsafe_allow_html=True
-)
+unsafe_allow_html=True)
