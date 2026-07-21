@@ -4,7 +4,7 @@ if "rows" not in st.session_state: st.session_state.rows=[]
 BANK=[("BCA","🏦"),("BRI","🏦"),("BNI","🏦"),("Mandiri","🏦"),("CIMB Niaga","🏦"),("DANA","🔵")]
 MOTOR=["Honda Beat","Beat Street","Scoopy","Genio","Vario 125","Vario 160","PCX160","ADV160","NMAX","Aerox","XMAX","CBR150R","CB150R","Ninja250","KLX150","Vespa Sprint","Fazzio","Gear"]
 MOBIL=["Brio","Agya","Ayla","Avanza","Xenia","Rush","Terios","Raize","Rocky","Innova Zenix","Fortuner","Pajero","HR-V","CR-V","BR-V","Camry","Alphard","BMW X5","Jimny","Creta"]
-KET=["😎 Kelihatannya sederhana, tapi isi rekeningnya bikin banyak orang penasaran.","💰 Rajin menabung sejak lama, hasilnya mulai kelihatan.","🚀 Rezekinya lancar, semoga terus bertambah.","👑 Diam-diam menghanyutkan, saldonya lebih besar dari yang dikira.","🎉 Kalau ini saldo asli, akhir bulan tetap senyum."]
+KET=["😎 Kelihatannya sederhana, tapi isi rekeningnya bikin banyak orang penasaran."," Waw kaya banget","Bagi duit nya dong","Pasti Rajin berbagi","💰 Rajin menabung sejak lama, hasilnya mulai kelihatan.","🚀 Rezekinya lancar, semoga terus bertambah.","👑 Diam-diam menghanyutkan, saldonya lebih besar dari yang dikira.","🎉 Kalau ini saldo asli, akhir bulan tetap senyum."]
 st.markdown("""
 <style>
 .stApp{background:url('https://i.imgur.com/XM6kK6A.png') repeat,linear-gradient(#f5f0e6,#fff8dc);background-size:120px,100%;animation:bgmove 25s linear infinite;background-attachment:fixed}
