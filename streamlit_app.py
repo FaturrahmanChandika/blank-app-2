@@ -1,84 +1,83 @@
 import streamlit as st
-import pandas as pd
+import random
+import hashlib
 
-st.set_page_config(
-    page_title="Aplikasi Tebak Isi Saldo",
-    layout="wide"
-)
+st.set_page_config(page_title="Tebak Isi Saldo", layout="centered")
 
-st.markdown("""
-<style>
+st.title("💰 Aplikasi Tebak Isi Saldo")
 
-.title{
-text-align:center;
-font-size:35px;
-font-weight:bold;
-color:white;
-padding:15px;
-background:linear-gradient(90deg,#3b82f6,#8b5cf6);
-border-radius:15px;
-}
+nama = st.text_input("Masukkan Nama")
 
-table{
-width:100%;
-}
-
-</style>
-""",unsafe_allow_html=True)
-
-st.markdown('<div class="title">💰 APLIKASI TEBAK ISI SALDO</div>',unsafe_allow_html=True)
-
-st.write("")
-
-data = [
-{
-"Nama":"SANTI",
-"Saldo":"OVO\nRp109.243",
-"Motor":"Honda Beat",
-"Mobil":"-",
-"Keterangan":"🤣 Kalo miskin itu penyakit, kamu udah endemik."
-},
-{
-"Nama":"ANTON",
-"Saldo":"Permata\nRp1.266.700",
-"Motor":"NMAX",
-"Mobil":"Avanza",
-"Keterangan":"🙈 Kamu versi ekonomis orang kaya."
-},
-{
-"Nama":"NAWAN",
-"Saldo":"CIMB\nRp2.793.147",
-"Motor":"Vario",
-"Mobil":"Fortuner",
-"Keterangan":"😎 Gajimu cukup buat streaming."
-},
-{
-"Nama":"RIAN",
-"Saldo":"Danamon\nRp1.667.194",
-"Motor":"PCX",
-"Mobil":"Brio",
-"Keterangan":"😂 Kelihatannya kaya tapi isi dompet standar."
-}
+ewallet = [
+    "OVO",
+    "DANA",
+    "GoPay",
+    "ShopeePay",
+    "BCA",
+    "BRI",
+    "Mandiri",
+    "BNI",
+    "CIMB",
+    "Permata"
 ]
 
-df = pd.DataFrame(data)
+motor = [
+    "Honda Beat",
+    "Honda Vario 160",
+    "Honda PCX",
+    "Yamaha NMAX",
+    "Yamaha Aerox",
+    "Kawasaki Ninja",
+    "Honda Scoopy",
+    "Yamaha Mio"
+]
 
-col1,col2 = st.columns([5,1])
+mobil = [
+    "Toyota Avanza",
+    "Toyota Fortuner",
+    "Toyota Alphard",
+    "Honda Brio",
+    "Honda HRV",
+    "Mitsubishi Pajero",
+    "BMW M4",
+    "Mercedes C200",
+    "Tidak Punya"
+]
 
-with col1:
-    keyword = st.text_input("Cari Nama")
+kata = [
+    "Rajin nabung ternyata.",
+    "Sultan diam-diam.",
+    "Dompetnya lebih tebal dari buku matematika.",
+    "Masih berjuang demi akhir bulan.",
+    "Kelihatannya sederhana, ternyata tajir.",
+    "Gaji numpang lewat.",
+    "Isi rekening bikin iri satu RT.",
+    "Sultan berkedok rakyat biasa."
+]
 
-with col2:
-    st.write("")
-    st.write("")
-    if st.button("🗑 Hapus Semua"):
-        df = df.iloc[0:0]
+if st.button("🔍 Tebak"):
 
-if keyword:
-    df = df[df["Nama"].str.contains(keyword.upper())]
+    if nama != "":
 
-st.dataframe(
-    df,
-    use_container_width=True,
-    hide_index=True
-)
+        # Supaya hasil nama yang sama selalu sama
+        seed = int(hashlib.md5(nama.lower().encode()).hexdigest(),16)
+        random.seed(seed)
+
+        saldo = random.randint(10000,50000000)
+
+        st.success(f"Nama : {nama.upper()}")
+
+        st.markdown("---")
+
+        st.subheader("💰 Saldo")
+        st.write(random.choice(ewallet))
+        st.write(f"### Rp {saldo:,}".replace(",", "."))
+
+        st.subheader("🏍 Motor")
+        st.write(random.choice(motor))
+
+        st.subheader("🚗 Mobil")
+        st.write(random.choice(mobil))
+
+        st.subheader("📝 Keterangan")
+        st.info(random.choice(kata))
