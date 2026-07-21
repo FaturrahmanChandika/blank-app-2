@@ -7,208 +7,178 @@ st.set_page_config(
     layout="wide"
 )
 
-# =========================
-# CSS
-# =========================
 st.markdown("""
 <style>
 
 .stApp{
-    background:#F4F7FC;
+    background-color:#ffffff;
 }
 
-/* Header */
-.header{
+.judul{
     background:#2563EB;
     color:white;
     text-align:center;
     padding:18px;
-    border-radius:15px;
-    font-size:40px;
-    font-weight:bold;
-    margin-bottom:30px;
-}
-
-/* Card */
-.card{
-    background:white;
-    border-radius:18px;
-    padding:20px;
-    height:260px;
-    border:1px solid #E5E7EB;
-    box-shadow:0 4px 12px rgba(0,0,0,.08);
-    text-align:center;
-}
-
-.icon{
-    font-size:55px;
-}
-
-.title{
-    font-size:30px;
-    font-weight:bold;
-    color:#1F2937;
-    margin-bottom:15px;
-}
-
-.value{
-    font-size:25px;
-    color:#2563EB;
-    font-weight:bold;
-    line-height:1.5;
-    word-wrap:break-word;
-}
-
-.saldo{
-    color:#16A34A;
-    font-size:32px;
-    font-weight:bold;
-    margin-top:10px;
-}
-
-.nama{
+    border-radius:12px;
     font-size:34px;
-    color:#2563EB;
     font-weight:bold;
+    margin-bottom:20px;
+}
+
+div[data-testid="stTextInput"] input{
+    border-radius:10px;
+    border:2px solid #16A34A;
+}
+
+.stButton>button{
+    background:#16A34A;
+    color:white;
+    border:none;
+    border-radius:10px;
+    font-size:18px;
+    font-weight:bold;
+    width:100%;
+}
+
+.stButton>button:hover{
+    background:#15803D;
+    color:white;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
     margin-top:20px;
 }
 
-.ket{
-    font-size:18px;
-    color:#444;
-    line-height:30px;
-    margin-top:15px;
+th{
+    background:#16A34A;
+    color:white;
+    padding:12px;
+    text-align:center;
+    font-size:16px;
+}
+
+td{
+    padding:12px;
+    border:1px solid #BBF7D0;
+    text-align:center;
+    background:#ECFDF5;
+    font-size:15px;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# =========================
-# HEADER
-# =========================
-
-st.markdown("""
-<div class='header'>
-💰 APLIKASI TEBAK ISI SALDO 💰
-</div>
-""", unsafe_allow_html=True)
+st.markdown(
+    "<div class='judul'>💰 APLIKASI TEBAK ISI SALDO 💰</div>",
+    unsafe_allow_html=True
+)
 
 nama = st.text_input("Masukkan Nama")
 
-# =========================
-# DATA
-# =========================
-
 bank = [
-"OVO","DANA","GoPay","ShopeePay",
-"BCA","BRI","BNI","Mandiri",
-"CIMB","Permata"
+    "OVO",
+    "DANA",
+    "GoPay",
+    "ShopeePay",
+    "BCA",
+    "BRI",
+    "BNI",
+    "Mandiri",
+    "CIMB",
+    "Permata"
 ]
 
 motor = [
-"Honda Beat",
-"Honda Vario 160",
-"Honda PCX",
-"Yamaha Aerox",
-"Yamaha NMAX",
-"Honda Scoopy",
-"Kawasaki Ninja",
-"CBR150R"
+    "Honda Beat",
+    "Honda Vario 160",
+    "Honda PCX",
+    "Yamaha Aerox",
+    "Yamaha NMAX",
+    "Honda Scoopy",
+    "CBR150R",
+    "Kawasaki Ninja"
 ]
 
 mobil = [
-"Toyota Avanza",
-"Honda Brio",
-"Honda HRV",
-"Toyota Fortuner",
-"Innova Zenix",
-"Mitsubishi Pajero",
-"BMW M4",
-"Mercedes C200",
-"Toyota Alphard",
-"Tidak Punya"
+    "Toyota Avanza",
+    "Honda Brio",
+    "Toyota Fortuner",
+    "Innova Zenix",
+    "Mitsubishi Pajero",
+    "Honda HRV",
+    "BMW M4",
+    "Toyota Alphard",
+    "Mercedes C200",
+    "Tidak Punya"
 ]
 
-kata = [
-"Sultan berkedok rakyat biasa 😎",
-"Isi rekening bikin iri satu RT 😂",
-"Rajin menabung sejak kecil 💰",
-"Orangnya sederhana tapi saldonya luar biasa.",
-"Gaji numpang lewat 🤣",
-"Jangan dipinjemin uang 😆",
-"Rekeningnya bikin tetangga iri.",
-"Dompetnya tebal banget."
+keterangan = [
+    "Sultan berkedok rakyat biasa 😎",
+    "Isi rekening bikin iri satu RT 😂",
+    "Rajin menabung sejak kecil 💰",
+    "Dompetnya tebal banget 😆",
+    "Gajinya numpang lewat 🤣",
+    "Jangan dipinjemin uang 😅",
+    "Orangnya sederhana tapi saldonya luar biasa 🔥",
+    "Rekeningnya bikin tetangga iri 👀"
 ]
 
-# =========================
-# BUTTON
-# =========================
+# ==========================
+# Tombol Tebak
+# ==========================
 
-if st.button("🔍 Tebak Sekarang", use_container_width=True):
+if st.button("🔍 Tebak Sekarang"):
 
     if nama.strip() == "":
-        st.warning("Masukkan nama terlebih dahulu.")
+        st.warning("Silakan masukkan nama terlebih dahulu.")
         st.stop()
 
-    seed = int(hashlib.md5(nama.lower().encode()).hexdigest(),16)
-
+    # Supaya nama yang sama hasilnya selalu sama
+    seed = int(hashlib.md5(nama.lower().encode()).hexdigest(), 16)
     random.seed(seed)
-
-    saldo = random.randint(50000,50000000)
 
     hasil_bank = random.choice(bank)
     hasil_motor = random.choice(motor)
     hasil_mobil = random.choice(mobil)
-    hasil_ket = random.choice(kata)
+    hasil_keterangan = random.choice(keterangan)
 
-    st.write("")
-    st.write("")
+    saldo = random.randint(100000, 50000000)
+    saldo = f"Rp {saldo:,}".replace(",", ".")
 
-    c1,c2,c3,c4,c5 = st.columns(5)
+    st.markdown(f"""
+    <table>
+        <thead>
+            <tr>
+                <th>👤 Nama</th>
+                <th>💳 Saldo</th>
+                <th>🏍️ Motor</th>
+                <th>🚗 Mobil</th>
+                <th>💬 Keterangan</th>
+            </tr>
+        </thead>
 
-    with c1:
-        st.markdown(f"""
-        <div class="card">
-            <div class="icon">👤</div>
-            <div class="title">Nama</div>
-            <div class="nama">{nama.upper()}</div>
-        </div>
-        """,unsafe_allow_html=True)
+        <tbody>
+            <tr>
+                <td><b>{nama.upper()}</b></td>
 
-    with c2:
-        saldo_format = f"Rp {saldo:,}".replace(",", ".")
-        st.markdown(f"""
-        <div class="card">
-            <div class="icon">💳</div>
-            <div class="title">Saldo</div>
-            <div class="value">{hasil_bank}</div>
-            <div class="saldo">{saldo_format}</div>
-        </div>
-        """,unsafe_allow_html=True)
+                <td>
+                    <b>{hasil_bank}</b><br>
+                    <span style="color:#16A34A;font-size:18px;font-weight:bold;">
+                        {saldo}
+                    </span>
+                </td>
 
-    with c3:
-        st.markdown(f"""
-        <div class="card">
-            <div class="icon">🏍️</div>
-            <div class="title">Motor</div>
-            <div class="value">{hasil_motor}</div>
-        </div>
-        """,unsafe_allow_html=True)
+                <td>{hasil_motor}</td>
 
-    with c4:
-        st.markdown(f"""
-        <div class="card">
-            <div class="icon">🚗</div>
-            <div class="title">Mobil</div>
-            <div class="value">{hasil_mobil}</div>
-        </div>
-        """,unsafe_allow_html=True)
+                <td>{hasil_mobil}</td>
 
-    with c5:
-        st.markdown(f"""
-        <div class="card">
-            <div class="icon">💬</div>
-            <div class="title">Keterangan</div>
-            <div class="ket">{hasil_ket}</div>
-        </div>
-        """,unsafe_allow_html=True)
+                <td>{hasil_keterangan}</td>
+            </tr>
+        </tbody>
+
+    </table>
+    """, unsafe_allow_html=True)
+
+    st.success("✅ Tebakan berhasil dibuat!")
