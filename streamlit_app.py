@@ -10,6 +10,7 @@ st.markdown("""
 .stButton>button{height:64px;font-size:20px;font-weight:bold;width:100%}
 div[data-testid="stTextInput"] input{height:64px;font-size:22px;border-radius:12px}
 .t{width:100%;border-collapse:collapse}.t th{background:#16a34a;color:#fff;padding:12px}.t td{border:1px solid #ddd;padding:12px;text-align:center}
+div[data-testid="column"]:nth-child(1) div[data-testid="stTextInput"]{margin-top:0px}
 </style>
 <h1 style='background:#2f63e0;color:#fff;padding:20px;border-radius:14px;text-align:center'>💰 APLIKASI TEBAK ISI SALDO 💰</h1>
 """,unsafe_allow_html=True)
@@ -24,8 +25,8 @@ if add and n.strip():
     row={"nama":n.upper(),"bank":random.choice(BANK),"saldo":"Rp {:,}".format(random.randint(100000,500000000)).replace(",","."),"motor":random.choice(MOTOR),"mobil":random.choice(MOBIL),"ket":random.choice(KET)}
     st.session_state.rows=[r for r in st.session_state.rows if r["nama"]!=row["nama"]]
     st.session_state.rows.insert(0,row)
-h="<table class='t'><tr><th>No</th><th>Nama</th><th>Saldo</th><th>Motor</th><th>Mobil</th><th>Keterangan</th></tr>"
+h="<table class='t'><tr><th>No</th><th>Nama</th><th>Saldo</th><th>Motor</th><th>Mobil</th><th style='background:#facc15;color:#000'>Keterangan</th></tr>"
 for i,r in enumerate(st.session_state.rows,1):
-    h+=f"<tr><td>{i}</td><td>{r['nama']}</td><td>{r['bank'][1]} {r['bank'][0]}<br><b>{r['saldo']}</b></td><td>🏍️ {r['motor']}</td><td>🚗 {r['mobil']}</td><td>{r['ket']}</td></tr>"
+    h+=f"<tr><td>{i}</td><td>{r['nama']}</td><td>{r['bank'][1]} {r['bank'][0]}<br><b>{r['saldo']}</b></td><td>🏍️ {r['motor']}</td><td>🚗 {r['mobil']}</td><td style='background:#fff9c4'>{r['ket']}</td></tr>"
 h+="</table>"
 st.markdown(h,unsafe_allow_html=True)
